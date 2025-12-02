@@ -1,39 +1,42 @@
+import os
 import tensorflow as tf
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras import layers, models
-import os
 
-DATASET_PATH = os.path.join("images")  # carpeta repo profe
+# Rutas del dataset
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+TRAIN_PATH = os.path.join(BASE_DIR, "dataset", "train")
+TEST_PATH  = os.path.join(BASE_DIR, "dataset", "test")
 
 img_height = 150
 img_width = 150
 batch_size = 32
 
-train_datagen = ImageDataGenerator(
-    rescale=1.0 / 255.0,
-    validation_split=0.2
-)
+# train y test
+
+train_datagen = ImageDataGenerator(rescale=1.0 / 255.0)
+test_datagen  = ImageDataGenerator(rescale=1.0 / 255.0)
 
 train_generator = train_datagen.flow_from_directory(
-    DATASET_PATH,
+    TRAIN_PATH,
     target_size=(img_height, img_width),
     batch_size=batch_size,
-    subset='training',
     class_mode='categorical'
 )
 
-val_generator = train_datagen.flow_from_directory(
-    DATASET_PATH,
+val_generator = test_datagen.flow_from_directory(
+    TEST_PATH,
     target_size=(img_height, img_width),
     batch_size=batch_size,
-    subset='validation',
     class_mode='categorical'
 )
 
 num_classes = train_generator.num_classes
 print("Clases detectadas:", train_generator.class_indices)
 
-# Definir CNN
+# Definir la CNN
 
 model = models.Sequential([
     layers.Conv2D(32, (3, 3), activation='relu',
